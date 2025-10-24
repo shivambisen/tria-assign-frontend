@@ -1,7 +1,8 @@
 import axios from "axios";
 import type { Contact } from "../types";
 
-const API_URL = "http://localhost:3000"; 
+const API_URL = import.meta.env.VITE_BACKEND_URL ; 
+console.log("hi",API_URL)
 
 export const getContacts = async (): Promise<Contact[]> => {
   const res = await axios.get(`${API_URL}/contact`);
