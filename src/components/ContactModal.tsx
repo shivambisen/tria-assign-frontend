@@ -40,7 +40,7 @@ export default function ContactModal({ contact, onClose }: Props) {
 
         <div className="space-y-3">
           {[["Email", contact.email, <Mail key="mail" className="h-5 w-5 text-blue-500" />],
-            ["Phone", contact.phone, <Phone key="phone" className="h-5 w-5 text-blue-500" />],
+            ["phome", contact.number, <Phone key="number" className="h-5 w-5 text-blue-500" />],
             ["Location", contact.location, <MapPin key="map" className="h-5 w-5 text-blue-500" />]
           ].map(([label, value, icon], i) => (
             <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-gray-100 dark:bg-gray-800">

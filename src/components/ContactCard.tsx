@@ -34,7 +34,7 @@ export default function ContactCard({ contact, onSelect }: ContactCardProps) {
             </div>
             <div className="flex items-center gap-2">
               <Phone className="h-4 w-4 text-blue-500" />
-              <span className="truncate">{contact.phone}</span>
+              <span className="truncate">{contact.number}</span>
             </div>
             <div className="flex items-center gap-2">
               <MapPin className="h-4 w-4 text-blue-500" />

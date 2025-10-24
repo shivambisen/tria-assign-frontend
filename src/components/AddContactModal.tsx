@@ -1,7 +1,7 @@
 import { X } from "lucide-react";
 
 interface Props {
-  newContact: { name: string; email: string; phone: string; location: string };
+  newContact: { name: string; email: string; number: string; location: string };
   setNewContact: (c: any) => void;
   onSubmit: (e: React.FormEvent) => void;
   onClose: () => void;
@@ -28,11 +28,11 @@ export default function AddContactModal({ newContact, setNewContact, onSubmit, o
         </div>
 
         <form onSubmit={onSubmit} className="space-y-4">
-          {["name", "email", "phone", "location"].map((field) => (
+          {["name", "email", "number", "location"].map((field) => (
             <div key={field}>
               <label className="block text-sm font-medium mb-2 capitalize">{field}</label>
               <input
-                type={field === "email" ? "email" : field === "phone" ? "tel" : "text"}
+                type={field === "email" ? "email" : field === "number" ? "tel" : "text"}
                 placeholder={`Enter ${field}`}
                 value={(newContact as any)[field]}
                 onChange={(e) => setNewContact({ ...newContact, [field]: e.target.value })}
