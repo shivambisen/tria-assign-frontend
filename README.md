@@ -1,73 +1,155 @@
-# React + TypeScript + Vite
+## Deployed link-
+ frontend - https://tria-assign-frontend.vercel.app
+ backend - https://tria-assign-backend.onrender.com
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-Currently, two official plugins are available:
+## Overview
+- This project is a full-stack web application built with a React frontend, an Express + Prisma backend, and containerized using Docker for easier deployment and scalability.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## React Compiler
+The application has been containerized so that it can run consistently across environments without manual setup or dependency conflicts.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Frontend
 
-## Expanding the ESLint configuration
+The frontend is developed using React (Vite + TypeScript) and styled with Tailwind CSS.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Key Features
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Dynamic Contact Management:
+Users can view, search, and add contacts without reloading the page. Data updates automatically after adding a new contact.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- Real-Time Search:
+The search bar supports real-time contact filtering using a debounced API call, ensuring fewer requests and smoother UX.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- Reusable Components:
+Components like Header, SearchBar, ContactCard, ContactModal, and AddContactModal are modular and easy to maintain or extend.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- State Management with React Hooks:
+The app uses hooks such as useState and useEffect to handle API calls, loading states, modal visibility, and contact selection.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Running the Frontend
+cd Connectly-webui
+npm install
+npm run dev
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+
+This starts the development server on http://localhost:5173 by default.
+
+Backend
+
+The backend is built using Node.js, Express, and Prisma ORM with a PostgreSQL (or other supported) database.
+
+Key Features
+
+RESTful API endpoints for contact management
+
+Prisma ORM for database access
+
+TypeScript for type safety
+
+Centralized error handling
+
+Environment-based configuration for easy deployment
+
+Example Routes
+
+GET /api/contact — Fetch all contacts
+
+GET /api/contact/search?q=term — Search for a contact by name
+
+POST /api/contact — Create a new contact
+
+PUT /api/contact — Update an existing contact
+
+DELETE /api/contact — Delete a contact
+
+Running the Backend
+cd backend
+npm install
+npx prisma migrate dev
+npm run dev
+
+
+The backend will start on http://localhost:5000 by default.
+
+Make sure to configure your .env file with the correct database connection string, for example:
+
+DATABASE_URL="postgresql://user:password@localhost:5432/connectly"
+
+Containerization
+
+The entire application is containerized using Docker.
+Each part (frontend, backend, and database) runs inside its own container for consistency and portability.
+
+Docker Setup
+
+Before building the containers, ensure you have Docker and Docker Compose installed.
+
+Building and Running Containers
+
+From the root directory of the project:
+
+docker-compose up --build
+
+
+This command will:
+
+Build and start the backend container
+
+Build and start the frontend container
+
+Optionally start a PostgreSQL container if configured
+
+The frontend will be available at http://localhost:5173
+The backend API will be available at http://localhost:5000/api
+
+Dockerfile Example (Frontend)
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+CMD ["npm", "run", "preview"]
+
+Dockerfile Example (Backend)
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+CMD ["npm", "run", "dev"]
+
+docker-compose.yml Example
+version: "3.9"
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend/.env
+  frontend:
+    build: ./Connectly-webui
+    ports:
+      - "5173:5173"
+    env_file:
+      - ./Connectly-webui/.env
+    depends_on:
+      - backend
+
+Development Notes
+
+Ensure that your .env files are correctly configured before running the containers.
+
+The frontend communicates with the backend using the base URL defined in VITE_BACKEND_URL.
+
+The backend must be running and accessible for the frontend API calls to work.
+
+To update environment variables or dependencies, rebuild the containers with docker-compose up --build.
+
+Conclusion
+
+This setup provides a simple but scalable full-stack architecture. React handles the user interface, Express + Prisma power the backend API, and Docker ensures consistent and reproducible deployment across environments.
+
+You can now extend this application by adding authentication, better state management, or additional features as needed.
