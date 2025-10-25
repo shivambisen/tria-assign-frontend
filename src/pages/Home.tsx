@@ -6,6 +6,7 @@ import ContactModal from "../components/ContactModal";
 import AddContactModal from "../components/AddContactModal";
 import type { Contact } from "../types";
 import { createContact, getContacts, searchContacts } from "../api/contactAPI";
+import toast from "react-hot-toast";
 
 export default function Home() {
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -66,10 +67,19 @@ export default function Home() {
       setContacts([newC, ...contacts]);
       setShowAddForm(false);
       setNewContact({ name: "", email: "", number: "", location: "" });
-    } catch (err) {
-      console.error("Failed to add contact", err);
+      toast.success("Contact added successfully!");
+    } catch (err: any) {
+      const message =
+        err.response?.data?.error ||
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to add contact";
+  
+      toast.error(message);
+      console.error("Failed to add contact:", message);
     }
   };
+  
 
   const handleLoadMore = () => {
     if (hasMore) setPage((prev) => prev + 1);
