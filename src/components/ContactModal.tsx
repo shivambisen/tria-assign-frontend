@@ -1,4 +1,4 @@
-import { X, Mail, Phone, MapPin, Trash2, Edit2 } from "lucide-react";
+import { X, Trash2, Edit2 } from "lucide-react";
 import type { Contact } from "../types";
 import { useState } from "react";
 import { updateContact, deleteContact } from "../api/contactAPI";
