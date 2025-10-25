@@ -15,32 +15,48 @@ export default function Home() {
   const [newContact, setNewContact] = useState({ name: "", email: "", number: "", location: "" });
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchContacts = async () => {
-      setLoading(true);
-      try {
-        const data = await getContacts();
-        setContacts(data);
-      } catch (err) {
-        console.error("Failed to fetch contacts", err);
-      } finally {
-        setLoading(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const limit = 6; 
+
+  const fetchContacts = async (reset = false) => {
+    setLoading(true);
+    try {
+      const data = await getContacts(page, limit);
+      if (reset) {
+        setContacts(data.data);
+      } else {
+        setContacts((prev) => [...prev, ...data.data]);
       }
-    };
-    fetchContacts();
-  }, []);
+      setHasMore(page < data.totalPages);
+    } catch (err) {
+      console.error("Failed to fetch contacts", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const handleSearch = async () => {
+    fetchContacts(true);
+  }, [page]);
+
+  useEffect(() => {
+    const delayDebounce = setTimeout(async () => {
       if (searchQuery.trim() === "") {
-        const allContacts = await getContacts();
-        setContacts(allContacts);
+        setPage(1);
+        fetchContacts(true);
         return;
       }
-      const results = await searchContacts(searchQuery);
-      setContacts(results);
-    };
-    handleSearch();
+      try {
+        const results = await searchContacts(searchQuery);
+        setContacts(results);
+        setHasMore(false); // Disable load more when searching
+      } catch (err) {
+        console.error("Failed to search contacts", err);
+      }
+    }, 400); // 400ms debounce
+
+    return () => clearTimeout(delayDebounce);
   }, [searchQuery]);
 
   const handleAddContact = async (e: React.FormEvent) => {
@@ -55,6 +71,10 @@ export default function Home() {
     }
   };
 
+  const handleLoadMore = () => {
+    if (hasMore) setPage((prev) => prev + 1);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-8 px-4 sm:px-6 lg:px-8 text-gray-900 dark:text-gray-100">
       <div className="max-w-7xl mx-auto">
@@ -65,16 +85,33 @@ export default function Home() {
           onAddClick={() => setShowAddForm(true)}
         />
 
-        {loading ? (
+        {loading && contacts.length === 0 ? (
           <p className="text-center text-gray-500 mt-8">Loading contacts...</p>
         ) : contacts.length === 0 ? (
           <p className="text-center text-gray-500 mt-8">No contacts found</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {contacts.map((contact) => (
-              <ContactCard key={contact.id} contact={contact} onSelect={setSelectedContact} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {contacts.map((contact) => (
+                <ContactCard key={contact.id} contact={contact} onSelect={setSelectedContact} />
+              ))}
+            </div>
+
+            {hasMore && !loading && (
+              <div className="text-center mt-8">
+                <button
+                  onClick={handleLoadMore}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                >
+                  Load More
+                </button>
+              </div>
+            )}
+
+            {loading && hasMore && (
+              <p className="text-center text-gray-500 mt-4">Loading more contacts...</p>
+            )}
+          </>
         )}
       </div>
 

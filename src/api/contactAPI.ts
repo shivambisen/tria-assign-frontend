@@ -4,10 +4,17 @@ import type { Contact } from "../types";
 const API_URL = import.meta.env.VITE_BACKEND_URL ; 
 console.log("hi",API_URL)
 
-export const getContacts = async (): Promise<Contact[]> => {
-  const res = await axios.get(`${API_URL}/contact`);
-  return res.data;
-};
+export const getContacts = async (page = 1, limit = 6): Promise<{
+    data: Contact[];
+    total: number;
+    page: number;
+    totalPages: number;
+  }> => {
+    const res = await axios.get(`${API_URL}/contact`, {
+      params: { page, limit },
+    });
+    return res.data; // expects { data, total, page, totalPages }
+  };
 
 export const createContact = async (contact: Omit<Contact, "id">): Promise<Contact> => {
   const res = await axios.post(`${API_URL}/contact`, contact);
