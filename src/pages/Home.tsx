@@ -125,8 +125,23 @@ export default function Home() {
         )}
       </div>
 
-      {selectedContact && <ContactModal contact={selectedContact} onClose={() => setSelectedContact(null)} />}
-      {showAddForm && (
+          {selectedContact && (
+            <ContactModal
+              contact={selectedContact}
+              onClose={() => setSelectedContact(null)}
+              onUpdateLocal={(updated) => {
+                setContacts((prev) =>
+                  prev.map((c) => (c.id === updated.id ? updated : c))
+                );
+                setSelectedContact(updated);
+              }}
+              onDeleteLocal={(id) => {
+                setContacts((prev) => prev.filter((c) => c.id !== id));
+                setSelectedContact(null);
+              }}
+            />
+          )}
+        {showAddForm && (
         <AddContactModal
           newContact={newContact}
           setNewContact={setNewContact}

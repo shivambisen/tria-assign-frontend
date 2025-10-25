@@ -27,10 +27,10 @@ export const searchContacts = async (query: string): Promise<Contact[]> => {
 };
 
 export const updateContact = async (id: number, data: Partial<Contact>): Promise<Contact> => {
-  const res = await axios.put(`${API_URL}/contact/${id}`, data);
+  const res = await axios.put(`${API_URL}/contact`, data, { params: { id } });
   return res.data;
 };
 
 export const deleteContact = async (id: number): Promise<void> => {
-  await axios.delete(`${API_URL}/contact/${id}`);
+  await axios.delete(`${API_URL}/contact`,{ params: { id } });
 };
